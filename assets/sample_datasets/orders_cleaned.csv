@@ -1,0 +1,6 @@
+order_id,amount,customer_id,State,target
+1,100,10,Karnataka,0
+2,150,11,Karnataka,0
+3,200,12,TamilNadu,1
+4,130,13,Karnataka,0
+5,300,14,Kerala,1
