@@ -25,6 +25,7 @@ from backend.services.data_profiler import profile_df
 from backend.services.data_cleaner import clean_df
 from backend.services.feature_engineer import engineer_features
 from backend import auth, train as train_module
+from backend.schemas import LoginRequest, RegisterRequest
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 FRONTEND_DIST = os.path.normpath(os.path.join(BASE_DIR, "..", "frontend", "dist"))
@@ -67,13 +68,9 @@ async def get_current_user(
 
 
 @app.post("/auth/register")
-async def register(data: Dict[str, str]):
-    email = (data.get("email") or "").strip()
-    password = data.get("password") or ""
-    if not email or not password:
-        raise HTTPException(status_code=400, detail="email and password are required")
+async def register(data: RegisterRequest):
     try:
-        user = auth.create_user(email, password)
+        user = auth.create_user(data.email, data.password)
     except Exception as exc:
         raise HTTPException(status_code=400, detail=str(exc))
     token = auth.issue_access_token(user)
@@ -81,10 +78,8 @@ async def register(data: Dict[str, str]):
 
 
 @app.post("/auth/login")
-async def login(data: Dict[str, str]):
-    email = (data.get("email") or "").strip()
-    password = data.get("password") or ""
-    user = auth.verify_user(email, password)
+async def login(data: LoginRequest):
+    user = auth.verify_user(data.email, data.password)
     if not user:
         raise HTTPException(status_code=401, detail="invalid credentials")
     token = auth.issue_access_token(user)
